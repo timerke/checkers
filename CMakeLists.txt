@@ -33,10 +33,16 @@ set(PROJECT_SOURCES
         src/mainwindow.h
         src/mainwindow.ui
         src/authorizationdialog.cpp
+        src/authorizationdialog.h
+        src/authorizationdialog.ui
         src/cell.cpp
+        src/cell.h
         src/checker.cpp
+        src/checker.h
         src/field.cpp
+        src/field.h
         src/game.cpp
+        src/game.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

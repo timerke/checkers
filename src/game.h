@@ -1,5 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
+#pragma once
 
 #include <QObject>
 #include <QString>
@@ -29,12 +30,13 @@ public:
     bool need_authorization();
     void set_name_for_black_player(QString name);
     void set_name_for_white_player(QString name);
-    void start_game();
+    void start_game(bool english);
 
 private:
     int calculate_step(Cell *cell_1, Cell *cell_2);
     Checker * check_enemy_checker_at_cell(Cell *cell);
-    bool check_possibility_of_move(Cell *cell);
+    bool check_possibility_of_move_english(Cell *cell);
+    bool check_possibility_of_move_russian(Cell *cell);
     void find_winner();
     int get_step();
     void init_player(CheckerType checker_type, Player *player, Checker **checkers);
@@ -57,6 +59,7 @@ public:
     Player white_player;
 
 private:
+    bool (Game::*check_possibility_of_move)(Cell *cell);
     QVector<Cell *> checker_path;
     Field *field;
     Player *player_to_run;

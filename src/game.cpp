@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "game.h"
 
 /**
@@ -8,9 +9,11 @@
 Game::Game(Field *field) {
     this->field = field;
     this->black_player = Player();
-    this->init_player(CheckerType::BLACK_CHECKER, &this->black_player, this->field->get_black_checkers());
+    this->init_player(CheckerType::BLACK_CHECKER, &this->black_player,
+                      this->field->get_black_checkers());
     this->white_player = Player();
-    this->init_player(CheckerType::WHITE_CHECKER, &this->white_player, this->field->get_white_checkers());
+    this->init_player(CheckerType::WHITE_CHECKER, &this->white_player,
+                      this->field->get_white_checkers());
     this->player_to_run = nullptr;
     this->player_to_wait = nullptr;
 }
@@ -44,9 +47,10 @@ int Game::calculate_step(Cell *cell_1, Cell *cell_2) {
 
 /**
  * @brief Game::check_enemy_checker_at_cell
- * Метод проверяет, что на указанной ячейке есть вражеская шашка.
+ * Метод проверяет, что на указанной ячейке есть вражеская шашка. Если на ячейке
+ * есть вражеская шашка, то функция возвращает ее.
  * @param cell - ячейка.
- * @return true, если на ячейке есть вражеская шашка.
+ * @return вражеская шашка.
  */
 Checker * Game::check_enemy_checker_at_cell(Cell *cell) {
     for (int i = 0; i < Field::CHECKERS_NUMBER; i++) {
@@ -60,37 +64,54 @@ Checker * Game::check_enemy_checker_at_cell(Cell *cell) {
 
 /**
  * @brief Game::check_possibility_of_move
- * Метод проверяет возможность хода в указанную ячейку.
+ * Метод проверяет возможность хода в указанную ячейку для английских шашек.
  * @param cell - ячейка.
  * @return true, если ход можно сделать.
  */
-bool Game::check_possibility_of_move(Cell *cell) {
-    if (cell && cell->check_black() && this->field->check_empty_cell(cell) && this->checker_path.indexOf(cell) < 0) {
+bool Game::check_possibility_of_move_english(Cell *cell) {
+    if (cell && cell->check_black() && this->field->check_empty_cell(cell) &&
+            this->checker_path.indexOf(cell) < 0) {
         int step = this->get_step();
         if (step == 1) {
+            qDebug() << "До этого уже сделан ход на одну клетку";
             return false;
         }
         Cell *previous_cell = this->checker_path.last();
         int current_step = this->calculate_step(previous_cell, cell);
         if ((current_step == -1 && this->player_to_run->checker_type != CheckerType::WHITE_CHECKER) ||
             (current_step == 1 && this->player_to_run->checker_type != CheckerType::BLACK_CHECKER)) {
+            qDebug() << "Назад на одну клетку ходить нельзя";
             return false;
         }
-        if ((step == 0 || step == 2) && abs(current_step) == 2) {
+        if ((step == 0 || step == 2) &&
+                ((current_step == 2 && this->player_to_run->checker_type == CheckerType::BLACK_CHECKER) ||
+                 (current_step == -2 && this->player_to_run->checker_type == CheckerType::WHITE_CHECKER))) {
             int column_between = (cell->column + previous_cell->column) / 2;
             int row_between = (cell->row + previous_cell->row) / 2;
             Cell *cell_between = this->field->get_cell(row_between, column_between);
             if (this->check_enemy_checker_at_cell(cell_between)) {
+                qDebug() << "Можно ходить на две клетки вперед, так как между клетками вражеская шашка";
                 return true;
             }
+            qDebug() << "Нельзя ходить на две клетки вперед, так как между клетками нет вражеской шашки";
             return false;
         }
         if (step == 0 && abs(current_step) == 1) {
+            qDebug() << "Можно ходить на одну клетку вперед";
             return true;
         }
-        return false;
     }
     return false;
+}
+
+/**
+ * @brief Game::check_possibility_of_move
+ * Метод проверяет возможность хода в указанную ячейку для русских шашек.
+ * @param cell - ячейка.
+ * @return true, если ход можно сделать.
+ */
+bool Game::check_possibility_of_move_russian(Cell *cell) {
+    return true;
 }
 
 /**
@@ -155,7 +176,7 @@ void Game::handle_checker_click(bool clicked, Checker *checker) {
  */
 void Game::handle_checker_move(QPointF pos) {
     Cell *cell = this->field->find_cell_at_pos(pos);
-    if (this->check_possibility_of_move(cell)) {
+    if ((this->*check_possibility_of_move)(cell)) {
         this->checker_path.append(cell);
         cell->select_cell_for_move();
     }
@@ -278,15 +299,22 @@ void Game::set_name_for_white_player(QString name) {
 /**
  * @brief Game::start_game
  * Метод начинает игру.
+ * @param english - если true, то начинается игра в английские шашки,
+ * иначе в русские.
  */
-void Game::start_game() {
+void Game::start_game(bool english) {
     if (!this->need_authorization()) {
         this->field->set_checkers_to_init_pos();
         this->black_player.current_account = 0;
         this->white_player.current_account = 0;
-        this->player_to_run = &this->white_player;
-        this->player_to_wait = &this->black_player;
+        this->player_to_run = &this->black_player;
+        this->player_to_wait = &this->white_player;
         this->set_condition_for_players_run();
+        if (english) {
+            this->check_possibility_of_move = &Game::check_possibility_of_move_english;
+        } else {
+            this->check_possibility_of_move = &Game::check_possibility_of_move_russian;
+        }
         emit this->account_changed();
     }
 }

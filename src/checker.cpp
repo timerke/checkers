@@ -11,6 +11,7 @@
  */
 Checker::Checker(CheckerType checker_type) : QObject(), QGraphicsItemGroup() {
     this->checker_type = checker_type;
+    this->king = false;
     QPen pen = this->get_pen(false);
     for (int i = 0; i < this->CIRCLES_NUMBER; i++) {
         QBrush brush = this->get_brush(i);

@@ -1,8 +1,11 @@
 #ifndef CHECKER_H
 #define CHECKER_H
+#pragma once
 
 #include <QGraphicsItemGroup>
 #include "cell.h"
+
+class Game;
 
 enum CheckerType {
     BLACK_CHECKER,
@@ -15,6 +18,8 @@ enum CheckerType {
  */
 class Checker : public QObject, public QGraphicsItemGroup {
     Q_OBJECT
+
+    friend class Game;
 
 public:
     explicit Checker(CheckerType checker_type);
@@ -43,6 +48,7 @@ private:
     static const int CIRCLES_NUMBER = 3;
     int checker_size;
     QGraphicsEllipseItem *circles[CIRCLES_NUMBER];
+    bool king;
 };
 
 #endif // CHECKER_H

@@ -15,8 +15,7 @@ QT_END_NAMESPACE
  * @brief The MainWindow class
  * Класс для основного окна приложения.
  */
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -31,6 +30,8 @@ public slots:
     void handle_authorization();
     void handle_checker_click(bool clicked);
     void handle_play_click();
+    void show_rules_for_english();
+    void show_rules_for_russian();
     void show_winner(Player *winner);
 
 private:

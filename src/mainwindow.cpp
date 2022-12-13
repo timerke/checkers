@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QMessageBox>
 #include "authorizationdialog.h"
 #include "mainwindow.h"
@@ -12,8 +13,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     connect(ui->action_authorise, &QAction::triggered, this, &MainWindow::handle_authorization);
     connect(ui->action_exit, &QAction::triggered, this, &MainWindow::close);
-    connect(ui->action_play, &QAction::triggered, this, &MainWindow::handle_play_click);
-    connect(ui->button_play, &QPushButton::clicked, this, &MainWindow::handle_play_click);
+    connect(ui->action_play_english, &QAction::triggered, this, &MainWindow::handle_play_click);
+    connect(ui->action_play_russian, &QAction::triggered, this, &MainWindow::handle_play_click);
+    connect(ui->action_rules_for_english, &QAction::triggered, this, &MainWindow::show_rules_for_english);
+    connect(ui->action_rules_for_russian, &QAction::triggered, this, &MainWindow::show_rules_for_russian);
 
     this->field = new Field();
     this->ui->widget->layout()->addWidget(this->field);
@@ -21,11 +24,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(this->game, &Game::account_changed, this, &MainWindow::handle_account_change);
     connect(this->game, &Game::checker_pressed_or_released, this, &MainWindow::handle_checker_click);
     connect(this->game, &Game::winner_found, this, &MainWindow::show_winner);
-
-    this->font = ui->label_player_black->font();
-    this->font.setBold(true);
-    ui->label_player_black->setFont(font);
-    ui->label_player_white->setFont(font);
 }
 
 /**
@@ -41,8 +39,7 @@ MainWindow::~MainWindow() {
  * Слот обрабатывает сигнал с изменением счета.
  */
 void MainWindow::handle_account_change() {
-    this->show_player_data(&this->game->black_player, this->ui->label_player_black);
-    this->show_player_data(&this->game->white_player, this->ui->label_player_white);
+
 }
 
 /**
@@ -50,12 +47,13 @@ void MainWindow::handle_account_change() {
  * Слот показывает диалоговое окно авторизации игроков.
  */
 void MainWindow::handle_authorization() {
-    AuthorizationDialog *dialog = new AuthorizationDialog(this->game->black_player.name, this->game->white_player.name);
-    if (dialog->exec()) {
-        this->game->black_player.name = dialog->get_black_player_name();
-        this->show_player_data(&this->game->black_player, this->ui->label_player_black);
-        this->game->white_player.name = dialog->get_white_player_name();
-        this->show_player_data(&this->game->white_player, this->ui->label_player_white);
+    CheckerType checkers[] = {CheckerType::BLACK_CHECKER, CheckerType::WHITE_CHECKER};
+    Player *players[] = {&this->game->black_player, &this->game->white_player};
+    for (int i = 0; i < 2; i++) {
+        AuthorizationDialog *dialog = new AuthorizationDialog(checkers[i]);
+        if (dialog->exec()) {
+            players[i]->name = dialog->get_player_name();
+        }
     }
 }
 
@@ -80,7 +78,13 @@ void MainWindow::handle_play_click() {
     if (this->game->need_authorization()) {
         this->handle_authorization();
     }
-    this->game->start_game();
+    if (this->sender() == this->ui->action_play_english) {
+        qDebug() << "Старт игры в английские шашки";
+        this->game->start_game(true);
+    } else if (this->sender() == this->ui->action_play_russian) {
+        qDebug() << "Старт игры в русские шашки";
+        this->game->start_game(true);
+    }
 }
 
 /**
@@ -107,6 +111,38 @@ void MainWindow::show_player_data(Player *player, QLabel *label) {
     label->setStyleSheet(color);
     label->setText(info);
     label->setToolTip(player->name);
+}
+
+/**
+ * @brief MainWindow::show_rules_for_english
+ * Метод выводит сообщение с правилами игры в английские шашки.
+ */
+void MainWindow::show_rules_for_english() {
+    QMessageBox::information(this, "Правила игры в английские шашки",
+                             "Первый ход делают чёрные (красные) шашки. «Простые» шашки могут ходить"
+                             " по диагонали на одно поле вперед и бить только вперед. Дамка может "
+                             "ходить на одно поле по диагонали вперед или назад, при взятии ходит "
+                             "только через одно поле в любую сторону. Взятие шашки соперника является "
+                             "обязательным.<br>При достижении последнего (восьмого от себя) горизонтального "
+                             "ряда простая шашка превращается в дамку. Если простая достигла последнего "
+                             "ряда во время взятия, то она превращается в дамку и останавливается, "
+                             "даже при возможности продолжить взятие.");
+}
+
+/**
+ * @brief MainWindow::show_rules_for_english
+ * Метод выводит сообщение с правилами игры в русские шашки.
+ */
+void MainWindow::show_rules_for_russian() {
+    QMessageBox::information(this, "Правила игры в русские шашки",
+                             "Первый ход делают чёрные (красные) шашки. «Простые» шашки могут ходить"
+                             " по диагонали на одно поле вперед, а бить только вперед и назад. Дамка "
+                             "ходит вперед и назад на любое поле той диагонали, на которой она стоит."
+                             "Дамка бьет вперед и назад, и становится на диагональ на любое свободное "
+                             "поле за побитой шашкой.<br>При достижении последнего (восьмого от себя)"
+                             " горизонтального ряда простая шашка превращается в дамку. Во время боя "
+                             "простая шашка может превратиться в дамку и сразу продолжить бой по "
+                             "правилам дамки.");
 }
 
 /**
