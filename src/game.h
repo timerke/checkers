@@ -8,12 +8,15 @@
 #include "checker.h"
 #include "field.h"
 
+/**
+ * @brief The Anonymous:1 struct
+ * Структура с данными игрока.
+ */
 struct {
     CheckerType checker_type;
     Checker **checkers;
-    int current_account;
     QString name;
-    int number_of_wins;
+    int score;
 } typedef Player;
 
 /**
@@ -27,7 +30,6 @@ class Game : public QObject
 public:
     Game(Field *field);
     ~Game();
-    bool need_authorization();
     void set_name_for_black_player(QString name);
     void set_name_for_white_player(QString name);
     void start_game(bool english);
@@ -50,8 +52,8 @@ public slots:
     void handle_checker_move(QPointF pos);
 
 signals:
-    void account_changed();
     void checker_pressed_or_released(bool pressed);
+    void score_changed();
     void winner_found(Player *winner);
 
 public:

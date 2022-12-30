@@ -23,7 +23,7 @@ public:
     Checker ** get_black_checkers();
     Cell * get_cell(int row, int column);
     Checker ** get_white_checkers();
-    void set_checkers_to_init_pos();
+    void set_checkers_to_init_pos(int checker_variant);
 
 private:
     void create_cells();

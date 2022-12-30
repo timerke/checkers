@@ -1,5 +1,5 @@
-#include "cell.h"
 #include <QPen>
+#include "cell.h"
 
 /**
  * @brief Cell::Cell
@@ -34,7 +34,7 @@ bool Cell::check_black() {
 }
 
 /**
- * @brief check_pos_in_cell
+ * @brief Cell::check_pos_in_cell
  * Метод проверяет, что указанная точка находится внутри ячейки.
  * @param pos - точка.
  * @return true, если точка внутри ячейки.

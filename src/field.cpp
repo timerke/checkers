@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "field.h"
 
 #define MIN_SIZE 100
@@ -14,8 +15,8 @@ Field::Field() : QGraphicsView() {
     this->setMinimumHeight(MIN_SIZE);
     this->setMinimumWidth(MIN_SIZE);
 
-    scene = new QGraphicsScene();
-    this->setScene(scene);
+    this->scene = new QGraphicsScene();
+    this->setScene(this->scene);
     this->create_cells();
 
     this->create_checkers(CheckerType::BLACK_CHECKER, black_checkers);
@@ -27,7 +28,7 @@ Field::Field() : QGraphicsView() {
  * Деструктор класса.
  */
 Field::~Field() {
-    delete scene;
+    delete this->scene;
 }
 
 /**
@@ -71,7 +72,7 @@ void Field::create_cells() {
  */
 void Field::create_checkers(CheckerType checker_type, Checker **checkers) {
     for (int i = 0; i < this->CHECKERS_NUMBER; i++) {
-        checkers[i] = new Checker(checker_type);
+        checkers[i] = new Checker(i, checker_type);
         this->scene->addItem(checkers[i]);
     }
 }
@@ -123,7 +124,7 @@ Cell * Field::find_cell_at_pos(QPointF &pos) {
 
 /**
  * @brief Field::get_black_checkers
- * Метод возвращает указатель на массив черных (красных) шашек.
+ * Метод возвращает указатель на массив черных шашек.
  * @return указатель на массив черных шашек.
  */
 Checker ** Field::get_black_checkers() {
@@ -143,7 +144,7 @@ Cell * Field::get_cell(int row, int column) {
 
 /**
  * @brief Field::get_white_checkers
- * Метод возвращает указатель на массив белых (синих) шашек.
+ * Метод возвращает указатель на массив белых шашек.
  * @return указатель на массив белых шашек.
  */
 Checker ** Field::get_white_checkers() {
@@ -164,18 +165,21 @@ void Field::resizeEvent(QResizeEvent *event) {
 /**
  * @brief Field::set_checkers_to_init_pos
  * Метод восстанавливает исходное состояние шашек перед игрой.
+ * @param checker_variant - вариант набора шашек.
  */
-void Field::set_checkers_to_init_pos() {
+void Field::set_checkers_to_init_pos(int checker_variant) {
     int black_index = 0;
     int white_index = 0;
     for (int row = 0; row < 3; row++) {
         for (int column = 0; column < this->CELLS_NUMBER; column++) {
-            if ((row + column) % 2) {
+            if (this->cells[row][column]->check_black()) {
+                this->black_checkers[black_index]->change_checker_status(false, checker_variant);
                 this->black_checkers[black_index]->set_position(this->cells[row][column]);
                 this->black_checkers[black_index]->show();
                 black_index++;
             }
-            if ((7 - row + column) % 2) {
+            if (this->cells[7 - row][column]->check_black()) {
+                this->white_checkers[white_index]->change_checker_status(false, checker_variant);
                 this->white_checkers[white_index]->set_position(this->cells[7 - row][column]);
                 this->white_checkers[white_index]->show();
                 white_index++;

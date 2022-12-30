@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/image">
+        <file>icon.png</file>
+        <file>eng.png</file>
+        <file>rus.png</file>
+        <file>exit.png</file>
+        <file>auth.png</file>
+        <file>black_checker_1.png</file>
+        <file>white_checker_1.png</file>
+        <file>black_checker_2.png</file>
+        <file>black_king_checker_1.png</file>
+        <file>black_king_checker_2.png</file>
+        <file>white_checker_2.png</file>
+        <file>white_king_checker_1.png</file>
+        <file>white_king_checker_2.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>black_checker_2.png</file>
+    </qresource>
+</RCC>

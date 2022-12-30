@@ -37,10 +37,10 @@ int Game::calculate_step(Cell *cell_1, Cell *cell_2) {
     int column_step = abs(cell_1->column - cell_2->column);
     int row_step = cell_2->row - cell_1->row;
     if (column_step != abs(row_step)) {
-        return -1;
+        return 3;
     }
     if (column_step > 2) {
-        return -1;
+        return 3;
     }
     return row_step;
 }
@@ -171,8 +171,7 @@ void Game::handle_checker_click(bool clicked, Checker *checker) {
 /**
  * @brief Game::handle_checker_move
  * Слот обрабатывает передвижение шашки мышкой.
- * @param pos - положение шашки;
- * @param checker - шашка.
+ * @param pos - положение шашки.
  */
 void Game::handle_checker_move(QPointF pos) {
     Cell *cell = this->field->find_cell_at_pos(pos);
@@ -192,9 +191,8 @@ void Game::handle_checker_move(QPointF pos) {
 void Game::init_player(CheckerType checker_type, Player *player, Checker **checkers) {
     player->checker_type = checker_type;
     player->checkers = checkers;
-    player->current_account = 0;
     player->name = "";
-    player->number_of_wins = 0;
+    player->score = 0;
     for (int i = 0; i < Field::CHECKERS_NUMBER; i++) {
         connect(checkers[i], &Checker::checker_moved, this, &Game::handle_checker_move);
         connect(checkers[i], &Checker::checker_pressed_or_released, this, &Game::handle_checker_click);
@@ -218,7 +216,6 @@ void Game::make_move(Checker *checker) {
     if (need_to_make_move_transition) {
         this->make_move_transition();
     }
-    emit this->account_changed();
 }
 
 /**
@@ -237,18 +234,6 @@ void Game::make_move_transition() {
 }
 
 /**
- * @brief Game::need_authorization
- * Метод проверяет, нужно ли авторизовать игроков.
- * @return true, если нужно.
- */
-bool Game::need_authorization() {
-    if (this->black_player.name == "" || this->white_player.name == "") {
-        return true;
-    }
-    return false;
-}
-
-/**
  * @brief Game::remove_enemy_checkers
  * Метод удаляет (съедает) вражесткую шашку при выполнении хода игроком.
  */
@@ -264,7 +249,10 @@ void Game::remove_enemy_checkers() {
             checker->hide();
         }
     }
-    this->player_to_run->current_account += number_of_removed_checkers;
+    this->player_to_run->score += number_of_removed_checkers;
+    if (number_of_removed_checkers) {
+        emit this->score_changed();
+    }
 }
 
 /**
@@ -299,22 +287,19 @@ void Game::set_name_for_white_player(QString name) {
 /**
  * @brief Game::start_game
  * Метод начинает игру.
- * @param english - если true, то начинается игра в английские шашки,
- * иначе в русские.
+ * @param english - если true, то начинается игра в английские шашки, иначе в русские.
  */
 void Game::start_game(bool english) {
-    if (!this->need_authorization()) {
-        this->field->set_checkers_to_init_pos();
-        this->black_player.current_account = 0;
-        this->white_player.current_account = 0;
-        this->player_to_run = &this->black_player;
-        this->player_to_wait = &this->white_player;
-        this->set_condition_for_players_run();
-        if (english) {
-            this->check_possibility_of_move = &Game::check_possibility_of_move_english;
-        } else {
-            this->check_possibility_of_move = &Game::check_possibility_of_move_russian;
-        }
-        emit this->account_changed();
+    this->field->set_checkers_to_init_pos(1);
+    this->black_player.score = 0;
+    this->white_player.score = 0;
+    this->player_to_run = &this->black_player;
+    this->player_to_wait = &this->white_player;
+    this->set_condition_for_players_run();
+    if (english) {
+        this->check_possibility_of_move = &Game::check_possibility_of_move_english;
+    } else {
+        this->check_possibility_of_move = &Game::check_possibility_of_move_russian;
     }
+    emit this->score_changed();
 }

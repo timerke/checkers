@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QGraphicsItemGroup>
+#include <QGraphicsPixmapItem>
 #include "cell.h"
 
 class Game;
@@ -22,9 +23,9 @@ class Checker : public QObject, public QGraphicsItemGroup {
     friend class Game;
 
 public:
-    explicit Checker(CheckerType checker_type);
+    explicit Checker(int index, CheckerType checker_type, int checker_variant = 1);
     ~Checker();
-    QPointF get_pos_of_center();
+    void change_checker_status(bool king, int checker_variant = 0);
     void handle_click(bool clicked);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -33,8 +34,8 @@ public:
     void set_position(Cell *cell);
 
 private:
-    QBrush get_brush(int circle_index);
-    QPen get_pen(bool selected);
+    QString get_file_for_checker();
+    QPen get_pen_for_selected_checker();
 
 signals:
     void checker_moved(QPointF pos);
@@ -43,12 +44,13 @@ signals:
 public:
     Cell *cell;
     CheckerType checker_type;
+    int index;
 
 private:
-    static const int CIRCLES_NUMBER = 3;
-    int checker_size;
-    QGraphicsEllipseItem *circles[CIRCLES_NUMBER];
+    int checker_variant;
+    QGraphicsEllipseItem *circle;
     bool king;
+    QGraphicsPixmapItem *pixmap_item;
 };
 
 #endif // CHECKER_H

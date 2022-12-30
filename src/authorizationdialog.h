@@ -27,9 +27,8 @@ class AuthorizationDialog : public QDialog {
     Q_OBJECT
 
 public:
-    AuthorizationDialog(CheckerType checker_type);
+    AuthorizationDialog();
     ~AuthorizationDialog();
-    CheckerType get_checker_type();
     QString get_player_name();
 
 private:
@@ -42,7 +41,6 @@ private slots:
 
 private:
     const QString DATABASE_NAME = "auth";
-    CheckerType checker_type;
     QVector<PlayerData> database;
     Ui::Dialog *ui;
 };

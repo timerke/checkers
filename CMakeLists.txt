@@ -47,16 +47,16 @@ set(PROJECT_SOURCES
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(checkers
-        ${PROJECT_SOURCES}
+        ${PROJECT_SOURCES} resources/resources.qrc
     )
 else()
     if(ANDROID)
         add_library(checkers SHARED
-            ${PROJECT_SOURCES}
+            ${PROJECT_SOURCES} resources/resources.qrc
         )
     else()
         add_executable(checkers
-            ${PROJECT_SOURCES}
+            ${PROJECT_SOURCES} resources/resources.qrc
         )
     endif()
 endif()

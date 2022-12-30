@@ -9,33 +9,23 @@
 /**
  * @brief AuthorizationDialog::AuthorizationDialog
  * Конструктор класса диалогового окна для авторизации.
- * @param checker_type - тип шашек (черные или белые), которыми будет играть
- * авторизующийся игрок.
  */
-AuthorizationDialog::AuthorizationDialog(CheckerType checker_type) : QDialog(), ui(new Ui::Dialog) {
+AuthorizationDialog::AuthorizationDialog() : QDialog(), ui(new Ui::Dialog) {
     ui->setupUi(this);
-    this->setWindowTitle("Авторизация");
+    this->setWindowIcon(QIcon(":/image/icon.png"));
 
-    this->checker_type = checker_type;
-    this->ui->line_edit_checkers_auth->setText(checker_type == CheckerType::BLACK_CHECKER ? "Красные" : "Синие");
-    QRegExp reg_exp_for_name("^[\\w]+$");
-    QRegExpValidator *validator_for_name = new QRegExpValidator(reg_exp_for_name);
+    const QRegExp REG_EXP_FOR_NAME("^[\\w]+$");
+    QRegExpValidator *validator_for_name = new QRegExpValidator(REG_EXP_FOR_NAME);
     this->ui->line_edit_name_auth->setValidator(validator_for_name);
-    this->ui->line_edit_name_auth->setToolTip("Логин может состоять из букв, цифр и знака подчеркивания");
-    QRegExp reg_exp_for_password("^[\\w!@#\\$%&\\*\\+\\-]+$");
-    QRegExpValidator *validator_for_password = new QRegExpValidator(reg_exp_for_password);
+    const QRegExp REG_EXP_FOR_PASSWORD("^[\\w!@#\\$%&\\*\\+\\-]+$");
+    QRegExpValidator *validator_for_password = new QRegExpValidator(REG_EXP_FOR_PASSWORD);
     this->ui->line_edit_password_auth->setValidator(validator_for_password);
-    this->ui->line_edit_password_auth->setToolTip("Пароль может состоять из букв, цифр и символов: _!@#%&*+-");
     connect(this->ui->button_cancel_auth, &QPushButton::clicked, this, &AuthorizationDialog::reject);
     connect(this->ui->button_ok_auth, &QPushButton::clicked, this, &AuthorizationDialog::handle_authorise);
 
-    this->ui->line_edit_checkers_reg->setText(checker_type == CheckerType::BLACK_CHECKER ? "Красные" : "Синие");
     this->ui->line_edit_name_reg->setValidator(validator_for_name);
-    this->ui->line_edit_name_reg->setToolTip("Логин может состоять из букв, цифр и знака подчеркивания");
     this->ui->line_edit_password_reg->setValidator(validator_for_password);
-    this->ui->line_edit_password_reg->setToolTip("Пароль может состоять из букв, цифр и символов: _!@#%&*+-");
     this->ui->line_edit_password_again_reg->setValidator(validator_for_password);
-    this->ui->line_edit_password_again_reg->setToolTip("Пароль может состоять из букв, цифр и символов: _!@#%&*+-");
     connect(this->ui->button_cancel_reg, &QPushButton::clicked, this, &AuthorizationDialog::reject);
     connect(this->ui->button_ok_reg, &QPushButton::clicked, this, &AuthorizationDialog::handle_register);
 
@@ -51,15 +41,6 @@ AuthorizationDialog::~AuthorizationDialog() {
 }
 
 /**
- * @brief AuthorizationDialog::get_checker_type
- * Метод возвращает тип шашек, которыми будет играть игрок.
- * @return тип шашке (черные или белые).
- */
-CheckerType AuthorizationDialog::get_checker_type() {
-    return this->checker_type;
-}
-
-/**
  * @brief AuthorizationDialog::get_player_name
  * Метод возвращает имя игрока, который авторизовался.
  * @return имя игрока.
@@ -71,8 +52,7 @@ QString AuthorizationDialog::get_player_name() {
     } else {
         name = this->ui->line_edit_name_reg->text();
     }
-    QString checkers = this->checker_type == CheckerType::BLACK_CHECKER ? "красными" : "синими";
-    qDebug() << "Имя авторизовавшегося игрока (с " << checkers << " шашками): " << name;
+    qDebug() << "Имя авторизовавшегося игрока: " << name;
     return name;
 }
 
@@ -140,11 +120,11 @@ void AuthorizationDialog::handle_register() {
 
 /**
  * @brief AuthorizationDialog::read_database
- * Метод читает данные о зарегистрированных игроках из бинарного файла.
+ * Метод читает данные о зарегистрированных игроках из бинарного файла - базы данных.
  */
 void AuthorizationDialog::read_database() {
     QFile database_file(this->DATABASE_NAME);
-    if(database_file.open(QIODevice::ReadOnly)) {
+    if (database_file.open(QIODevice::ReadOnly)) {
         QDataStream stream(&database_file);
         stream.setVersion(QDataStream::Qt_4_6);
         PlayerData data;

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>312</width>
+    <width>303</width>
     <height>200</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Авторизация</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -27,40 +27,39 @@
        <item>
         <layout class="QFormLayout" name="form_layout_auth">
          <item row="0" column="0">
-          <widget class="QLabel" name="label_checkers_auth">
-           <property name="text">
-            <string>Шашки</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="line_edit_checkers_auth">
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
           <widget class="QLabel" name="label_name_auth">
            <property name="text">
             <string>Логин</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="line_edit_name_auth"/>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="line_edit_name_auth">
+           <property name="toolTip">
+            <string>Логин может состоять из букв, цифр и знака подчеркивания</string>
+           </property>
+           <property name="placeholderText">
+            <string>login</string>
+           </property>
+          </widget>
          </item>
-         <item row="2" column="0">
+         <item row="1" column="0">
           <widget class="QLabel" name="label_password_auth">
            <property name="text">
             <string>Пароль</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="1" column="1">
           <widget class="QLineEdit" name="line_edit_password_auth">
+           <property name="toolTip">
+            <string>Пароль может состоять из букв, цифр и символов: _!@#%&amp;*+-</string>
+           </property>
            <property name="echoMode">
             <enum>QLineEdit::Password</enum>
+           </property>
+           <property name="placeholderText">
+            <string>password</string>
            </property>
           </widget>
          </item>
@@ -119,55 +118,60 @@
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <layout class="QFormLayout" name="form_layout_reg">
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="line_edit_name_reg"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="line_edit_checkers_reg">
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0">
-          <widget class="QLabel" name="label_checkers_reg">
-           <property name="text">
-            <string>Шашки</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
           <widget class="QLabel" name="label_name_reg">
            <property name="text">
             <string>Логин</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="line_edit_name_reg">
+           <property name="toolTip">
+            <string>Логин может состоять из букв, цифр и знака подчеркивания</string>
+           </property>
+           <property name="placeholderText">
+            <string>login</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
           <widget class="QLabel" name="label_password_reg">
            <property name="text">
             <string>Пароль</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="1" column="1">
           <widget class="QLineEdit" name="line_edit_password_reg">
+           <property name="toolTip">
+            <string>Пароль может состоять из букв, цифр и символов: _!@#%&amp;*+-</string>
+           </property>
            <property name="echoMode">
             <enum>QLineEdit::Password</enum>
            </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="line_edit_password_again_reg">
-           <property name="echoMode">
-            <enum>QLineEdit::Password</enum>
+           <property name="placeholderText">
+            <string>password</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label_password_again_reg">
            <property name="text">
             <string>Повторите пароль</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="line_edit_password_again_reg">
+           <property name="toolTip">
+            <string>Пароль может состоять из букв, цифр и символов: _!@#%&amp;*+-</string>
+           </property>
+           <property name="echoMode">
+            <enum>QLineEdit::Password</enum>
+           </property>
+           <property name="placeholderText">
+            <string>password</string>
            </property>
           </widget>
          </item>

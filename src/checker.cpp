@@ -1,4 +1,5 @@
 #include <QCursor>
+#include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QObject>
 #include <QPen>
@@ -6,22 +7,25 @@
 
 /**
  * @brief Checker::Checker
- * Конструктор класс для шашки.
- * @param checker_type - тип шашки (черная или белая).
+ * Конструктор класса для шашки.
+ * @param index - индекс шашки;
+ * @param checker_type - тип шашки (черная или белая);
+ * @param checker_variant - вариант набора шашек.
  */
-Checker::Checker(CheckerType checker_type) : QObject(), QGraphicsItemGroup() {
-    this->checker_type = checker_type;
-    this->king = false;
-    QPen pen = this->get_pen(false);
-    for (int i = 0; i < this->CIRCLES_NUMBER; i++) {
-        QBrush brush = this->get_brush(i);
-        this->circles[i] = new QGraphicsEllipseItem();
-        this->circles[i]->setPen(pen);
-        this->circles[i]->setBrush(brush);
-        this->addToGroup(this->circles[i]);
-    }
-    this->setFlag(QGraphicsItem::ItemIsMovable);
+Checker::Checker(int index, CheckerType checker_type, int checker_variant) : QObject(), QGraphicsItemGroup() {
     this->cell = nullptr;
+    this->checker_type = checker_type;
+    this->checker_variant = checker_variant;
+    this->index = index;
+    this->king = false;
+    QString checker_file = this->get_file_for_checker();
+    this->pixmap_item = new QGraphicsPixmapItem(QPixmap(checker_file));
+    this->addToGroup(this->pixmap_item);
+    this->circle = new QGraphicsEllipseItem();
+    this->circle->setPen(this->get_pen_for_selected_checker());
+    this->circle->setVisible(false);
+    this->addToGroup(this->circle);
+    this->setVisible(false);
 }
 
 /**
@@ -33,78 +37,61 @@ Checker::~Checker() {
 }
 
 /**
- * @brief Checker::get_brush
- * Метод возвращает кисть для шашки.
- * @param circle_index - номер кружка, который нужно закрасить.
- * @return кисть.
+ * @brief Checker::change_checker_status
+ * Метод переводит шашку в дамки и обратно.
+ * @param king - если true, то шашка становится дамкой;
+ * @param checker_variant - вариант набора шашек.
  */
-QBrush Checker::get_brush(int circle_index) {
-    QBrush brush;
-    if (this->checker_type == CheckerType::BLACK_CHECKER) {
-        switch (circle_index) {
-        case 0:
-            brush.setColor(QColor(240, 128, 128));
-            break;
-        case 1:
-            brush.setColor(QColor(250, 138, 138));
-            break;
-        default:
-            brush.setColor(QColor(255, 148, 148));
-        }
-    } else {
-        switch (circle_index) {
-        case 0:
-            brush.setColor(QColor(100, 149, 237));
-            break;
-        case 1:
-            brush.setColor(QColor(110, 159, 247));
-            break;
-        default:
-            brush.setColor(QColor(120, 169, 255));
-        }
+void Checker::change_checker_status(bool king, int checker_variant) {
+    if (checker_variant) {
+        this->checker_variant = checker_variant;
     }
-    brush.setStyle(Qt::SolidPattern);
-    return brush;
+    this->king = king;
+    QString pixmap_file = this->get_file_for_checker();
+    this->pixmap_item->setPixmap(QPixmap(pixmap_file));
+}
+
+/**
+ * @brief Checker::get_file_for_checker
+ * Метод возвращает имя файла с изображением шашки.
+ * @return файл с изображением.
+ */
+QString Checker::get_file_for_checker() {
+    QString king("");
+    if (this->king) {
+        king = "_king";
+    }
+    QString color;
+    if (this->checker_type == CheckerType::BLACK_CHECKER) {
+        color = "black";
+    } else {
+        color = "white";
+    }
+    return ":/image/" + color + king + "_checker_" + QString::number(this->checker_variant) + ".png";
 }
 
 /**
  * @brief Checker::get_pen
- * Метод возвращает перо для шашки в указанном состоянии.
- * @param selected - если true, то шашка выбрана игроком.
+ * Метод возвращает перо для выделения шашки.
  * @return перо.
  */
-QPen Checker::get_pen(bool selected) {
+QPen Checker::get_pen_for_selected_checker() {
     QPen pen;
-    if (selected) {
-        pen.setColor(QColor(this->checker_type == CheckerType::BLACK_CHECKER ? Qt::red : Qt::blue));
-    } else {
-        pen.setColor(QColor(105, 105, 105));
-    }
+    pen.setColor(QColor(this->checker_type == CheckerType::BLACK_CHECKER ? Qt::red : Qt::blue));
     pen.setStyle(Qt::SolidLine);
+    pen.setWidth(2);
     return pen;
 }
 
 /**
- * @brief Checker::get_pos_of_center
- * Метод возвращает положение центра шашки.
- * @return точка в центре шашки.
- */
-QPointF Checker::get_pos_of_center() {
-    QRectF rect = this->circles[0]->rect();
-    qreal x = this->pos().x() + rect.width() / 2.0;
-    qreal y = this->pos().y() + rect.height() / 2.0;
-    return QPointF(x, y);
-}
-
-/**
  * @brief Checker::handle_click
- * Метод отрисовывает кружки на шашке при клике по ней.
+ * Метод отрисовывает кружок на шашке при клике по ней.
  * @param clicked - если true, то игрок кликнул по шашке.
  */
 void Checker::handle_click(bool clicked) {
-    for (int i = 0; i < this->CIRCLES_NUMBER; i++) {
-        this->circles[i]->setPen(this->get_pen(clicked));
-    }
+    this->setZValue(clicked * 2);
+    this->circle->setVisible(clicked);
+    this->circle->setZValue(clicked * 2);
 }
 
 /**
@@ -123,6 +110,7 @@ void Checker::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
  * @param event - событие по выбору мышкой виджта.
  */
 void Checker::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+    qDebug() << this->checker_type << " " << this->index << " " << this->boundingRect();
     emit this->checker_pressed_or_released(true, this);
     QGraphicsItemGroup::mousePressEvent(event);
 }
@@ -143,18 +131,17 @@ void Checker::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
  */
 void Checker::redraw() {
     if (this->cell) {
-        QRectF rect = this->cell->rect();
-        int dx = rect.width() / 5;
-        int dy = rect.height() / 5;
-        for (int i = 0; i < this->CIRCLES_NUMBER; i++) {
-            int x = i * dx;
-            int y = i * dy;
-            int width = dx * (5 - 2 * i);
-            int height = dy * (5 - 2 * i);
-            QRectF rect_for_circle(x, y, width, height);
-            this->circles[i]->setRect(rect_for_circle);
-        }
-        this->setPos(rect.x(), rect.y());
+        QRectF cell_rect = this->cell->rect();
+        QRect pixmap_rect = this->pixmap_item->pixmap().rect();
+        qreal pixmap_size = cell_rect.width() * 0.8;
+        this->pixmap_item->pixmap().scaled(pixmap_size, pixmap_size);
+        this->pixmap_item->setScale(pixmap_size / pixmap_rect.width());
+        qreal x = cell_rect.x() + (cell_rect.width() - pixmap_size) / 2;
+        qreal y = cell_rect.y() + (cell_rect.height() - pixmap_size) / 2;
+        this->circle->setRect(0, 0, pixmap_size, pixmap_size);
+        this->removeFromGroup(this->pixmap_item);
+        this->addToGroup(this->pixmap_item);
+        this->setPos(x, y);
     }
 }
 
