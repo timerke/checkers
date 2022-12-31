@@ -149,26 +149,6 @@ int Game::get_step() {
 }
 
 /**
- * @brief Game::handle_checker_click
- * Слот обрабатывает клик игрока по указанной шашке.
- * @param clicked - true, если шашка выбрана, иначе - освобождена;
- * @param checker - шашка.
- */
-void Game::handle_checker_click(bool clicked, Checker *checker) {
-    if (checker->checker_type == this->player_to_run->checker_type) {
-        checker->handle_click(clicked);
-        emit this->checker_pressed_or_released(clicked);
-        if (!clicked) {
-            this->make_move(checker);
-            this->find_winner();
-        } else {
-            this->checker_path.clear();
-            this->checker_path.append(checker->cell);
-        }
-    }
-}
-
-/**
  * @brief Game::handle_checker_move
  * Слот обрабатывает передвижение шашки мышкой.
  * @param pos - положение шашки.
@@ -178,6 +158,27 @@ void Game::handle_checker_move(QPointF pos) {
     if ((this->*check_possibility_of_move)(cell)) {
         this->checker_path.append(cell);
         cell->select_cell_for_move();
+    }
+}
+
+/**
+ * @brief Game::handle_checker_click
+ * Слот обрабатывает клик игрока по указанной шашке или наведении мышки.
+ * @param checker - шашка;
+ * @param checker_status -
+ */
+void Game::handle_mouse_action(Checker *checker, CheckerStatus checker_status) {
+    if (checker->checker_type == this->player_to_run->checker_type) {
+        checker->handle_mouse_action(checker_status);
+        if (checker_status == CheckerStatus::RELEASED) {
+            emit this->checker_pressed_or_released(false);
+            this->make_move(checker);
+            this->find_winner();
+        } else if (checker_status == CheckerStatus::PRESSED) {
+            emit this->checker_pressed_or_released(true);
+            this->checker_path.clear();
+            this->checker_path.append(checker->cell);
+        }
     }
 }
 
@@ -195,7 +196,7 @@ void Game::init_player(CheckerType checker_type, Player *player, Checker **check
     player->score = 0;
     for (int i = 0; i < Field::CHECKERS_NUMBER; i++) {
         connect(checkers[i], &Checker::checker_moved, this, &Game::handle_checker_move);
-        connect(checkers[i], &Checker::checker_pressed_or_released, this, &Game::handle_checker_click);
+        connect(checkers[i], &Checker::mouse_action_happened, this, &Game::handle_mouse_action);
     }
 }
 
@@ -290,7 +291,7 @@ void Game::set_name_for_white_player(QString name) {
  * @param english - если true, то начинается игра в английские шашки, иначе в русские.
  */
 void Game::start_game(bool english) {
-    this->field->set_checkers_to_init_pos(1);
+    this->field->set_checkers_to_init_pos(2);
     this->black_player.score = 0;
     this->white_player.score = 0;
     this->player_to_run = &this->black_player;

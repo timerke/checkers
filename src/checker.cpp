@@ -1,5 +1,4 @@
 #include <QCursor>
-#include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QObject>
 #include <QPen>
@@ -9,23 +8,20 @@
  * @brief Checker::Checker
  * Конструктор класса для шашки.
  * @param index - индекс шашки;
- * @param checker_type - тип шашки (черная или белая);
- * @param checker_variant - вариант набора шашек.
+ * @param checker_type - тип шашки (черная или белая).
  */
-Checker::Checker(int index, CheckerType checker_type, int checker_variant) : QObject(), QGraphicsItemGroup() {
+Checker::Checker(int index, CheckerType checker_type) : QObject(), QGraphicsItemGroup() {
     this->cell = nullptr;
     this->checker_type = checker_type;
-    this->checker_variant = checker_variant;
     this->index = index;
     this->king = false;
-    QString checker_file = this->get_file_for_checker();
-    this->pixmap_item = new QGraphicsPixmapItem(QPixmap(checker_file));
+    this->pixmap_item = new QGraphicsPixmapItem();
     this->addToGroup(this->pixmap_item);
     this->circle = new QGraphicsEllipseItem();
-    this->circle->setPen(this->get_pen_for_selected_checker());
     this->circle->setVisible(false);
     this->addToGroup(this->circle);
     this->setVisible(false);
+    this->setAcceptHoverEvents(true);
 }
 
 /**
@@ -43,55 +39,76 @@ Checker::~Checker() {
  * @param checker_variant - вариант набора шашек.
  */
 void Checker::change_checker_status(bool king, int checker_variant) {
-    if (checker_variant) {
-        this->checker_variant = checker_variant;
-    }
     this->king = king;
-    QString pixmap_file = this->get_file_for_checker();
+    QString pixmap_file = this->get_file_for_checker(checker_variant);
     this->pixmap_item->setPixmap(QPixmap(pixmap_file));
 }
 
 /**
  * @brief Checker::get_file_for_checker
  * Метод возвращает имя файла с изображением шашки.
+ * @param checker_variant - вариант набора шашек.
  * @return файл с изображением.
  */
-QString Checker::get_file_for_checker() {
-    QString king("");
-    if (this->king) {
-        king = "_king";
-    }
-    QString color;
-    if (this->checker_type == CheckerType::BLACK_CHECKER) {
-        color = "black";
-    } else {
-        color = "white";
-    }
-    return ":/image/" + color + king + "_checker_" + QString::number(this->checker_variant) + ".png";
+QString Checker::get_file_for_checker(int checker_variant) {
+    QString king = this->king ? "_king" : "";
+    QString color = this->checker_type == CheckerType::BLACK_CHECKER ? "black" : "white";
+    return ":/image/" + color + king + "_checker_" + QString::number(checker_variant) + ".png";
 }
 
 /**
  * @brief Checker::get_pen
  * Метод возвращает перо для выделения шашки.
+ * @param width - толщина пера.
  * @return перо.
  */
-QPen Checker::get_pen_for_selected_checker() {
+QPen Checker::get_pen(int width) {
     QPen pen;
-    pen.setColor(QColor(this->checker_type == CheckerType::BLACK_CHECKER ? Qt::red : Qt::blue));
+    pen.setColor(QColor(this->checker_type == CheckerType::BLACK_CHECKER ? Qt::black : Qt::white));
     pen.setStyle(Qt::SolidLine);
-    pen.setWidth(2);
+    pen.setWidth(width);
     return pen;
 }
 
 /**
  * @brief Checker::handle_click
- * Метод отрисовывает кружок на шашке при клике по ней.
- * @param clicked - если true, то игрок кликнул по шашке.
+ * Метод отрисовывает кружок на шашке при клике по ней или при наведении на нее мышки.
+ * @param checker_status - состояние шашки (на нее навели мышку, кликнули по ней или
+ * ничего не сделали).
  */
-void Checker::handle_click(bool clicked) {
-    this->setZValue(clicked * 2);
-    this->circle->setVisible(clicked);
-    this->circle->setZValue(clicked * 2);
+void Checker::handle_mouse_action(CheckerStatus checker_status) {
+    bool visible = false;
+    int width = 0;
+    int z_value = 0;
+    if (checker_status == CheckerStatus::PRESSED || checker_status == CheckerStatus::HOVER_STARTED) {
+        visible = true;
+        z_value = 2;
+        width = checker_status == CheckerStatus::PRESSED ? 2 : 1;
+    }
+    this->setZValue(z_value);
+    this->circle->setPen(this->get_pen(width));
+    this->circle->setVisible(visible);
+    this->circle->setZValue(z_value);
+}
+
+/**
+ * @brief Checker::hoverEnterEvent
+ * Переопределение метода обработки наведения мышки на шашку.
+ * @param event - событие, когда мышка оказывается над шашкой.
+ */
+void Checker::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+    emit this->mouse_action_happened(this, CheckerStatus::HOVER_STARTED);
+    QGraphicsItemGroup::hoverEnterEvent(event);
+}
+
+/**
+ * @brief Checker::hoverLeaveEvent
+ * Переопределение метода обработки завершения наведения мыщки на шашку.
+ * @param event - событие, когда мышка оказывается вне шашки.
+ */
+void Checker::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    emit this->mouse_action_happened(this, CheckerStatus::HOVER_STOPPED);
+    QGraphicsItemGroup::hoverLeaveEvent(event);
 }
 
 /**
@@ -110,8 +127,7 @@ void Checker::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
  * @param event - событие по выбору мышкой виджта.
  */
 void Checker::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-    qDebug() << this->checker_type << " " << this->index << " " << this->boundingRect();
-    emit this->checker_pressed_or_released(true, this);
+    emit this->mouse_action_happened(this, CheckerStatus::PRESSED);
     QGraphicsItemGroup::mousePressEvent(event);
 }
 
@@ -121,7 +137,7 @@ void Checker::mousePressEvent(QGraphicsSceneMouseEvent *event) {
  * @param event - событие по освобождению мышкой виджета.
  */
 void Checker::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-    emit this->checker_pressed_or_released(false, this);
+    emit this->mouse_action_happened(this, CheckerStatus::RELEASED);
     QGraphicsItemGroup::mouseReleaseEvent(event);
 }
 

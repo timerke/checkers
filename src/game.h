@@ -48,8 +48,8 @@ private:
     void set_condition_for_players_run();
 
 public slots:
-    void handle_checker_click(bool ckicked, Checker *checker);
     void handle_checker_move(QPointF pos);
+    void handle_mouse_action(Checker *checker, CheckerStatus checker_status);
 
 signals:
     void checker_pressed_or_released(bool pressed);

@@ -13,6 +13,14 @@ enum CheckerType {
     WHITE_CHECKER
 };
 
+enum CheckerStatus {
+    HOVER_STARTED,
+    HOVER_STOPPED,
+    PRESSED,
+    QUIET,
+    RELEASED
+};
+
 /**
  * @brief The Checker class
  * Класс для шашки.
@@ -23,10 +31,12 @@ class Checker : public QObject, public QGraphicsItemGroup {
     friend class Game;
 
 public:
-    explicit Checker(int index, CheckerType checker_type, int checker_variant = 1);
+    explicit Checker(int index, CheckerType checker_type);
     ~Checker();
     void change_checker_status(bool king, int checker_variant = 0);
-    void handle_click(bool clicked);
+    void handle_mouse_action(CheckerStatus checker_status);
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -34,12 +44,12 @@ public:
     void set_position(Cell *cell);
 
 private:
-    QString get_file_for_checker();
-    QPen get_pen_for_selected_checker();
+    QString get_file_for_checker(int checker_variant);
+    QPen get_pen(int width);
 
 signals:
     void checker_moved(QPointF pos);
-    void checker_pressed_or_released(bool pressed, Checker *checker);
+    void mouse_action_happened(Checker *checker, CheckerStatus checker_status);
 
 public:
     Cell *cell;
@@ -47,10 +57,10 @@ public:
     int index;
 
 private:
-    int checker_variant;
     QGraphicsEllipseItem *circle;
     bool king;
     QGraphicsPixmapItem *pixmap_item;
+    const int SELECTED_LINE_WIDTH = 2;
 };
 
 #endif // CHECKER_H

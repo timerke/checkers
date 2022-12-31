@@ -69,7 +69,7 @@ QBrush Cell::get_brush_for_cell() {
         brush = QBrush(QColor("white"));
     } else {
         // Кисть для черных клеток
-        brush = QBrush(QColor(44, 44, 44));
+        brush = QBrush(QColor(78, 78, 78));
     }
     return brush;
 }
