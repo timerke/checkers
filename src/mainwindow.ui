@@ -32,7 +32,7 @@
      <x>0</x>
      <y>0</y>
      <width>483</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -43,6 +43,7 @@
     <addaction name="separator"/>
     <addaction name="action_play_english"/>
     <addaction name="action_play_russian"/>
+    <addaction name="action_settings"/>
     <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
@@ -89,6 +90,11 @@
   <action name="action_rules_for_russian">
    <property name="text">
     <string>Правила игры в русские шашки</string>
+   </property>
+  </action>
+  <action name="action_settings">
+   <property name="text">
+    <string>Настройки</string>
    </property>
   </action>
  </widget>

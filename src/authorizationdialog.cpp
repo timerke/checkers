@@ -10,7 +10,7 @@
  * @brief AuthorizationDialog::AuthorizationDialog
  * Конструктор класса диалогового окна для авторизации.
  */
-AuthorizationDialog::AuthorizationDialog() : QDialog(), ui(new Ui::Dialog) {
+AuthorizationDialog::AuthorizationDialog() : QDialog(), ui(new Ui::AuthorizationDialog) {
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/image/icon.png"));
 

@@ -29,6 +29,7 @@ public slots:
     void handle_checker_click(bool clicked);
     void handle_play_click();
     void handle_score_change();
+    void handle_settings_click();
     void show_rules_for_english();
     void show_rules_for_russian();
     void show_winner(Player *winner);

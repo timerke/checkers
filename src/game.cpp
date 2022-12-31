@@ -291,7 +291,7 @@ void Game::set_name_for_white_player(QString name) {
  * @param english - если true, то начинается игра в английские шашки, иначе в русские.
  */
 void Game::start_game(bool english) {
-    this->field->set_checkers_to_init_pos(2);
+    this->field->set_checkers_to_init_pos(1);
     this->black_player.score = 0;
     this->white_player.score = 0;
     this->player_to_run = &this->black_player;

@@ -13,6 +13,9 @@
         <file>white_checker_2.png</file>
         <file>white_king_checker_1.png</file>
         <file>white_king_checker_2.png</file>
+        <file>settings.png</file>
+        <file>left.png</file>
+        <file>right.png</file>
     </qresource>
     <qresource prefix="/">
         <file>black_checker_2.png</file>

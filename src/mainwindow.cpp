@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include "authorizationdialog.h"
 #include "mainwindow.h"
+#include "settingsdialog.h"
 #include "./ui_mainwindow.h"
 
 /**
@@ -22,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->action_play_english, &QAction::triggered, this, &MainWindow::handle_play_click);
     ui->action_play_russian->setIcon(QIcon(":/image/rus.png"));
     connect(ui->action_play_russian, &QAction::triggered, this, &MainWindow::handle_play_click);
+    ui->action_settings->setIcon(QIcon(":/image/settings.png"));
+    connect(ui->action_settings, &QAction::triggered, this, &MainWindow::handle_settings_click);
     ui->action_rules_for_english->setIcon(QIcon(":/image/eng.png"));
     connect(ui->action_rules_for_english, &QAction::triggered, this, &MainWindow::show_rules_for_english);
     ui->action_rules_for_russian->setIcon(QIcon(":/image/rus.png"));
@@ -52,6 +55,7 @@ void MainWindow::handle_authorization() {
     if (dialog->exec()) {
         QString player_name = dialog->get_player_name();
     }
+    delete dialog;
 }
 
 /**
@@ -87,6 +91,18 @@ void MainWindow::handle_play_click() {
  */
 void MainWindow::handle_score_change() {
 
+}
+
+/**
+ * @brief MainWindow::handle_settings_click
+ * Слот обрабатывает сигнал показать окно с настройками игры.
+ */
+void MainWindow::handle_settings_click() {
+    SettingsDialog *dialog = new SettingsDialog();
+    if (dialog->exec()) {
+
+    }
+    delete dialog;
 }
 
 /**

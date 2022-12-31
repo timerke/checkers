@@ -16,7 +16,7 @@ struct {
 } typedef PlayerData;
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class Dialog; }
+namespace Ui { class AuthorizationDialog; }
 QT_END_NAMESPACE
 
 /**
@@ -42,7 +42,7 @@ private slots:
 private:
     const QString DATABASE_NAME = "auth";
     QVector<PlayerData> database;
-    Ui::Dialog *ui;
+    Ui::AuthorizationDialog *ui;
 };
 
 #endif // AUTHORIZATIONDIALOG_H

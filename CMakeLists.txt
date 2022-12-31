@@ -43,6 +43,9 @@ set(PROJECT_SOURCES
         src/field.h
         src/game.cpp
         src/game.h
+        src/settingsdialog.cpp
+        src/settingsdialog.h
+        src/settingsdialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
