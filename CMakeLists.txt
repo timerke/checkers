@@ -43,6 +43,10 @@ set(PROJECT_SOURCES
         src/field.h
         src/game.cpp
         src/game.h
+        src/optionwidget.cpp
+        src/optionwidget.h
+        src/selectionwidget.cpp
+        src/selectionwidget.h
         src/settingsdialog.cpp
         src/settingsdialog.h
         src/settingsdialog.ui

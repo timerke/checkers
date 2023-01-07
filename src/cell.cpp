@@ -3,17 +3,20 @@
 
 /**
  * @brief Cell::Cell
- * Конструктор класса для ячейки шашечной доски.
- * @param row - номер строки на шашечной доске для ячейки;
- * @param column - номер столбца на шашечной доске для ячейки.
+ * Конструктор класса для клетки на шашечной доске.
+ * @param row - номер строки на шашечной доске для клетки;
+ * @param column - номер столбца на шашечной доске для клетки;
+ * @param cell_type - тип клетки (черная или белая);
+ * @param cell_color - цвет клетки.
  */
-Cell::Cell(int row, int column) : QGraphicsRectItem() {
+Cell::Cell(int row, int column, CellType cell_type, QColor cell_color) : QGraphicsRectItem() {
+    this->cell_color = cell_color;
+    this->cell_type = cell_type;
     this->column = column;
     this->row = row;
-    this->cell_type = this->get_cell_type(row, column);
     QPen pen(Qt::black);
     this->setPen(pen);
-    this->setBrush(this->get_brush_for_cell());
+    this->setBrush(QBrush(cell_color));
 }
 
 /**
@@ -26,8 +29,8 @@ Cell::~Cell() {
 
 /**
  * @brief Cell::check_black
- * Метод проверяет, является ли ячейка черной.
- * @return true, если ячейка черная.
+ * Метод проверяет, является ли клетка черной.
+ * @return true, если клетка черная.
  */
 bool Cell::check_black() {
     return this->cell_type == CellType::BLACK_CELL;
@@ -35,9 +38,9 @@ bool Cell::check_black() {
 
 /**
  * @brief Cell::check_pos_in_cell
- * Метод проверяет, что указанная точка находится внутри ячейки.
+ * Метод проверяет, что указанная точка находится внутри клетки.
  * @param pos - точка.
- * @return true, если точка внутри ячейки.
+ * @return true, если точка внутри клетки.
  */
 bool Cell::check_pos_in_cell(QPointF pos) {
     QRectF rect = this->rect();
@@ -50,7 +53,7 @@ bool Cell::check_pos_in_cell(QPointF pos) {
 
 /**
  * @brief Cell::deselect_cell_for_move
- * Метод изменяет отрисовку границы ячейки, делает границу обычной.
+ * Метод изменяет отрисовку границы клетки и делает границу обычной.
  */
 void Cell::deselect_cell_for_move() {
     QPen pen(Qt::black);
@@ -58,42 +61,20 @@ void Cell::deselect_cell_for_move() {
 }
 
 /**
- * @brief Cell::get_brush
- * Метод возвращает кисть для ячейки шашечной доски в заданном ряду и столбце.
- * @return кисть для ячейки.
- */
-QBrush Cell::get_brush_for_cell() {
-    QBrush brush;
-    if (this->cell_type == CellType::WHITE_CELL) {
-        // Кисть для белых клеток
-        brush = QBrush(QColor("white"));
-    } else {
-        // Кисть для черных клеток
-        brush = QBrush(QColor(78, 78, 78));
-    }
-    return brush;
-}
-
-/**
- * @brief Cell::get_cell_type
- * Метод возвращает тип ячейки (черная или белая).
- * @param row - номер строки на шашечном поле;
- * @param column - номер столбца на шашечном поле.
- * @return тип ячейки.
- */
-CellType Cell::get_cell_type(int row, int column) {
-    if ((row + column) % 2) {
-        return CellType::BLACK_CELL;
-    }
-    return CellType::WHITE_CELL;
-}
-
-/**
  * @brief Cell::select_cell_for_move
- * Метод изменяет отрисовку границы ячейки, делает ее выделенной.
+ * Метод изменяет отрисовку границы клетки, делает ее выделенной.
  */
 void Cell::select_cell_for_move() {
     QPen pen(Qt::yellow);
     pen.setWidth(2);
     this->setPen(pen);
+}
+
+/**
+ * @brief Cell::set_cell_color
+ * Метод задает новый цвет для клетки.
+ * @param cell_color - новый цвет клетки.
+ */
+void Cell::set_cell_color(QColor cell_color) {
+    this->cell_color = cell_color;
 }

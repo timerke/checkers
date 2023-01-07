@@ -4,7 +4,7 @@
 
 /**
  * @brief SettingsDialog::SettingsDialog
- * Конструктор класс для окна с настройками.
+ * Конструктор класса для окна с настройками.
  */
 SettingsDialog::SettingsDialog() : QDialog(), ui(new Ui::SettingsDialog) {
     ui->setupUi(this);

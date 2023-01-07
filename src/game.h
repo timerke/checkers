@@ -23,12 +23,11 @@ struct {
  * @brief The Game class
  * Класс для управления правилами игры.
  */
-class Game : public QObject
-{
+class Game : public QObject {
     Q_OBJECT
 
 public:
-    Game(Field *field);
+    Game();
     ~Game();
     void set_name_for_black_player(QString name);
     void set_name_for_white_player(QString name);
@@ -58,12 +57,15 @@ signals:
 
 public:
     Player black_player;
+    Field *field;
     Player white_player;
 
 private:
+    const int CHECKER_NUMBER = 12;
+    const int COLUMN_NUMBER = 8;
+    const int ROW_NUMBER = 8;
     bool (Game::*check_possibility_of_move)(Cell *cell);
     QVector<Cell *> checker_path;
-    Field *field;
     Player *player_to_run;
     Player *player_to_wait;
 };

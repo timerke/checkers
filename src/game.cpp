@@ -4,10 +4,9 @@
 /**
  * @brief Game::Game
  * Конструктор класса, который управляет игрой.
- * @param field - шашечное поле.
  */
-Game::Game(Field *field) {
-    this->field = field;
+Game::Game() {
+    this->field = new Field(this->ROW_NUMBER, this->COLUMN_NUMBER, this->CHECKER_NUMBER);
     this->black_player = Player();
     this->init_player(CheckerType::BLACK_CHECKER, &this->black_player,
                       this->field->get_black_checkers());
@@ -28,10 +27,10 @@ Game::~Game() {
 
 /**
  * @brief Game::calculate_step
- * Метод вычисляет шаг между указанными ячейками.
- * @param cell_1 - первая ячейка;
- * @param cell_2 - вторая ячейка.
- * @return шаг между ячейками.
+ * Метод вычисляет шаг между указанными клетками.
+ * @param cell_1 - первая клетка;
+ * @param cell_2 - вторая клетка.
+ * @return шаг между клетками.
  */
 int Game::calculate_step(Cell *cell_1, Cell *cell_2) {
     int column_step = abs(cell_1->column - cell_2->column);
@@ -47,13 +46,13 @@ int Game::calculate_step(Cell *cell_1, Cell *cell_2) {
 
 /**
  * @brief Game::check_enemy_checker_at_cell
- * Метод проверяет, что на указанной ячейке есть вражеская шашка. Если на ячейке
+ * Метод проверяет, что на указанной клетке есть вражеская шашка. Если на клетке
  * есть вражеская шашка, то функция возвращает ее.
- * @param cell - ячейка.
+ * @param cell - клетка.
  * @return вражеская шашка.
  */
 Checker * Game::check_enemy_checker_at_cell(Cell *cell) {
-    for (int i = 0; i < Field::CHECKERS_NUMBER; i++) {
+    for (int i = 0; i < this->CHECKER_NUMBER; i++) {
         if (this->player_to_wait->checkers[i]->isVisible() &&
             this->player_to_wait->checkers[i]->cell == cell) {
             return this->player_to_wait->checkers[i];
@@ -64,8 +63,8 @@ Checker * Game::check_enemy_checker_at_cell(Cell *cell) {
 
 /**
  * @brief Game::check_possibility_of_move
- * Метод проверяет возможность хода в указанную ячейку для английских шашек.
- * @param cell - ячейка.
+ * Метод проверяет возможность хода в указанную клетку для английских шашек.
+ * @param cell - клетка.
  * @return true, если ход можно сделать.
  */
 bool Game::check_possibility_of_move_english(Cell *cell) {
@@ -106,8 +105,8 @@ bool Game::check_possibility_of_move_english(Cell *cell) {
 
 /**
  * @brief Game::check_possibility_of_move
- * Метод проверяет возможность хода в указанную ячейку для русских шашек.
- * @param cell - ячейка.
+ * Метод проверяет возможность хода в указанную клетку для русских шашек.
+ * @param cell - клетка.
  * @return true, если ход можно сделать.
  */
 bool Game::check_possibility_of_move_russian(Cell *cell) {
@@ -121,7 +120,7 @@ bool Game::check_possibility_of_move_russian(Cell *cell) {
 void Game::find_winner() {
     int black_checkers_removed = 0;
     int white_checkers_removed = 0;
-    for (int i = 0; i < Field::CHECKERS_NUMBER; i++) {
+    for (int i = 0; i < this->CHECKER_NUMBER; i++) {
         if (!this->black_player.checkers[i]->isVisible()) {
             black_checkers_removed++;
         }
@@ -129,9 +128,9 @@ void Game::find_winner() {
             white_checkers_removed++;
         }
     }
-    if (black_checkers_removed == Field::CHECKERS_NUMBER) {
+    if (black_checkers_removed == this->CHECKER_NUMBER) {
         emit this->winner_found(&this->white_player);
-    } else if (white_checkers_removed == Field::CHECKERS_NUMBER) {
+    } else if (white_checkers_removed == this->CHECKER_NUMBER) {
         emit this->winner_found(&this->black_player);
     }
 }
@@ -194,7 +193,7 @@ void Game::init_player(CheckerType checker_type, Player *player, Checker **check
     player->checkers = checkers;
     player->name = "";
     player->score = 0;
-    for (int i = 0; i < Field::CHECKERS_NUMBER; i++) {
+    for (int i = 0; i < this->CHECKER_NUMBER; i++) {
         connect(checkers[i], &Checker::checker_moved, this, &Game::handle_checker_move);
         connect(checkers[i], &Checker::mouse_action_happened, this, &Game::handle_mouse_action);
     }
@@ -261,7 +260,7 @@ void Game::remove_enemy_checkers() {
  * Метод делает неподвижными шашки игрока, который не ходит сейчас.
  */
 void Game::set_condition_for_players_run() {
-    for (int i = 0; i < Field::CHECKERS_NUMBER; i++) {
+    for (int i = 0; i < this->CHECKER_NUMBER; i++) {
         this->player_to_run->checkers[i]->setFlag(QGraphicsItem::ItemIsMovable);
         this->player_to_wait->checkers[i]->setFlag(QGraphicsItem::ItemIsMovable, false);
     }

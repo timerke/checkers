@@ -22,8 +22,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private:
-
 public slots:
     void handle_authorization();
     void handle_checker_click(bool clicked);
@@ -35,8 +33,6 @@ public slots:
     void show_winner(Player *winner);
 
 private:
-    static const int PLAYER_NAME_LENGTH = 10;
-    Field *field;
     Game *game;
     Ui::MainWindow *ui;  
 };

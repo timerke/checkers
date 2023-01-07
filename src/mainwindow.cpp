@@ -30,9 +30,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->action_rules_for_russian->setIcon(QIcon(":/image/rus.png"));
     connect(ui->action_rules_for_russian, &QAction::triggered, this, &MainWindow::show_rules_for_russian);
 
-    this->field = new Field();
-    this->ui->widget->layout()->addWidget(this->field);
-    this->game = new Game(this->field);
+    this->game = new Game();
+    this->ui->widget->layout()->addWidget(this->game->field);
     connect(this->game, &Game::score_changed, this, &MainWindow::handle_score_change);
     connect(this->game, &Game::checker_pressed_or_released, this, &MainWindow::handle_checker_click);
     connect(this->game, &Game::winner_found, this, &MainWindow::show_winner);
