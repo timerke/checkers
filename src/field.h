@@ -24,7 +24,8 @@ public:
     Cell * get_cell(int row, int column);
     Checker ** get_white_checkers();
     void set_cell_colors(QColor black, QColor white);
-    void set_checkers_to_init_pos(int checker_variant);
+    void set_checker_variant(int checker_variant);
+    void set_checkers_to_init_pos();
 
 private:
     void create_cells();
@@ -35,12 +36,11 @@ private:
     QColor get_cell_color(CellType cell_type);
     void resizeEvent(QResizeEvent *event);
 
-public:
-    int checker_number;
-
 private:
     Checker **black_checkers;
     Cell ***cells;
+    int checker_number;
+    int checker_variant = 1;
     QColor color_for_black_cells = QColor(78, 78, 78);
     QColor color_for_white_cells = QColor("white");
     int column_number;

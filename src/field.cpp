@@ -222,18 +222,26 @@ void Field::set_cell_colors(QColor black, QColor white) {
 }
 
 /**
- * @brief Field::set_checkers_to_init_pos
- * Метод восстанавливает исходное состояние шашек перед игрой.
+ * @brief Field::set_checker_variant
+ * Метод задает новый вариант набора шашек.
  * @param checker_variant - вариант набора шашек.
  */
-void Field::set_checkers_to_init_pos(int checker_variant) {
+void Field::set_checker_variant(int checker_variant) {
+    this->checker_variant = checker_variant;
+}
+
+/**
+ * @brief Field::set_checkers_to_init_pos
+ * Метод восстанавливает исходное состояние шашек перед игрой.
+ */
+void Field::set_checkers_to_init_pos() {
     int index = 0;
     int checker_index = 0;
     while (checker_index < this->checker_number) {
         int row = index / this->column_number;
         int column = index % this->column_number;
         if (this->cells[row][column]->check_black()) {
-            this->black_checkers[checker_index]->change_checker_status(false, checker_variant);
+            this->black_checkers[checker_index]->change_checker_status(false, this->checker_variant);
             this->black_checkers[checker_index]->set_position(this->cells[row][column]);
             this->black_checkers[checker_index]->show();
             checker_index++;
