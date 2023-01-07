@@ -1,4 +1,5 @@
 #include <QCursor>
+#include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QObject>
 #include <QPen>

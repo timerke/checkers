@@ -41,6 +41,8 @@ set(PROJECT_SOURCES
         src/checker.h
         src/field.cpp
         src/field.h
+        src/fieldwidget.cpp
+        src/fieldwidget.h
         src/game.cpp
         src/game.h
         src/optionwidget.cpp

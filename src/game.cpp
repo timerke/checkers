@@ -22,7 +22,7 @@ Game::Game() {
  * Деструктор класса.
  */
 Game::~Game() {
-
+    delete this->field;
 }
 
 /**

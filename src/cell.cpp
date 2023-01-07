@@ -62,7 +62,7 @@ void Cell::deselect_cell_for_move() {
 
 /**
  * @brief Cell::select_cell_for_move
- * Метод изменяет отрисовку границы клетки, делает ее выделенной.
+ * Метод изменяет отрисовку границы клетки и делает ее выделенной.
  */
 void Cell::select_cell_for_move() {
     QPen pen(Qt::yellow);

@@ -1,8 +1,6 @@
 #include <QDebug>
 #include "field.h"
 
-#define MIN_SIZE 100
-
 /**
  * @brief Field::Field
  * Конструктор класса с игровым полем.
@@ -10,21 +8,11 @@
  * @param column_number - количество столбцов;
  * @param checker_number - количество шашек каждого типа (черных и белых).
  */
-Field::Field(int row_number, int column_number, int checker_number) : QGraphicsView() {
-    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    this->setAlignment(Qt::AlignCenter);
-    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    this->setMinimumHeight(MIN_SIZE);
-    this->setMinimumWidth(MIN_SIZE);
-
+Field::Field(int row_number, int column_number, int checker_number) : QObject() {
     this->checker_number = checker_number;
     this->column_number = column_number;
     this->row_number = row_number;
-    this->scene = new QGraphicsScene();
-    this->setScene(this->scene);
     this->create_cells();
-
     this->create_checkers(CheckerType::BLACK_CHECKER, &this->black_checkers);
     this->create_checkers(CheckerType::WHITE_CHECKER, &this->white_checkers);
 }
@@ -40,7 +28,20 @@ Field::~Field() {
         delete []this->cells[row];
     }
     delete []this->cells;
-    delete this->scene;
+}
+
+/**
+ * @brief Field::calculate_cell_size
+ * Метод вычисляет размер одной клетки при заданных высоте и ширине виджета, в который
+ * помещено поле.
+ * @param widget_height - высота виджета;
+ * @param widget_width - ширина виджета.
+ * @return размер клетки.
+ */
+qreal Field::calculate_cell_size(qreal widget_height, qreal widget_width) {
+    qreal height = widget_height / this->row_number;
+    qreal width = widget_width / this->column_number;
+    return qMin(height, width);
 }
 
 /**
@@ -66,7 +67,6 @@ bool Field::check_empty_cell(Cell *cell) {
  * Метод создает клетки и помещает их на сцену.
  */
 void Field::create_cells() {
-    this->scene->setBackgroundBrush(QBrush(QColor(208, 208, 208)));
     this->cells = new Cell **[this->row_number];
     for (int row = 0; row < this->row_number; row++) {
         this->cells[row] = new Cell *[this->column_number];
@@ -74,10 +74,8 @@ void Field::create_cells() {
             CellType cell_type = this->get_cell_type(row, column);
             QColor color = this->get_cell_color(cell_type);
             this->cells[row][column] = new Cell(row, column, cell_type, color);
-            this->scene->addItem(this->cells[row][column]);
         }
     }
-    this->draw_cells();
 }
 
 /**
@@ -90,7 +88,6 @@ void Field::create_checkers(CheckerType checker_type, Checker ***checkers) {
     *checkers = new Checker *[this->checker_number];
     for (int i = 0; i < this->checker_number; i++) {
         (*checkers)[i] = new Checker(i, checker_type);
-        this->scene->addItem((*checkers)[i]);
     }
 }
 
@@ -98,11 +95,7 @@ void Field::create_checkers(CheckerType checker_type, Checker ***checkers) {
  * @brief Field::draw_cells
  * Метод рисует клетки на шашечной доске.
  */
-void Field::draw_cells() {
-    qreal height = this->size().height() / this->row_number;
-    qreal width = this->size().width() / this->column_number;
-    qreal cell_size = qMin(height, width);
-    this->scene->setSceneRect(0, 0, this->column_number * cell_size, this->row_number * cell_size);
+void Field::draw_cells(qreal cell_size) {
     for (int row = 0; row < this->row_number; row++) {
         for (int column = 0; column < this->column_number; column++) {
             int x = column * cell_size;
@@ -194,17 +187,6 @@ Checker ** Field::get_white_checkers() {
 }
 
 /**
- * @brief Field::resizeEvent
- * Переопределение метода, обрабатывающего событие изменения размера виджета.
- * @param event - событие изменения размера виджета.
- */
-void Field::resizeEvent(QResizeEvent *event) {
-    this->draw_cells();
-    this->draw_checkers();
-    QGraphicsView::resizeEvent(event);
-}
-
-/**
  * @brief Field::set_cell_colors
  * Метод задает новые цвета для черных и белых клеток.
  * @param black - новый цвет для черных клеток;
@@ -260,5 +242,22 @@ void Field::set_checkers_to_init_pos() {
             checker_index++;
         }
         index++;
+    }
+}
+
+/**
+ * @brief Field::set_to_scence
+ * Метод помещает поле на заданную сцену.
+ * @param scene - сцена.
+ */
+void Field::set_to_scence(QGraphicsScene *scene) {
+    for (int row = 0; row < this->row_number; row++) {
+        for (int column = 0; column < this->column_number; column++) {
+            scene->addItem(this->cells[row][column]);
+        }
+    }
+    for (int index = 0; index < this->checker_number; index++) {
+        scene->addItem(this->black_checkers[index]);
+        scene->addItem(this->white_checkers[index]);
     }
 }

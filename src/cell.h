@@ -1,7 +1,7 @@
 #ifndef CELL_H
 #define CELL_H
 
-#include <QBrush>
+#include <QColor>
 #include <QGraphicsRectItem>
 
 enum CellType {

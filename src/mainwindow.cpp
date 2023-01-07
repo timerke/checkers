@@ -31,7 +31,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->action_rules_for_russian, &QAction::triggered, this, &MainWindow::show_rules_for_russian);
 
     this->game = new Game();
-    this->ui->widget->layout()->addWidget(this->game->field);
+    this->field_widget = new FieldWidget();
+    this->field_widget->set_field(this->game->field);
+    this->ui->widget->layout()->addWidget(this->field_widget);
     connect(this->game, &Game::score_changed, this, &MainWindow::handle_score_change);
     connect(this->game, &Game::checker_pressed_or_released, this, &MainWindow::handle_checker_click);
     connect(this->game, &Game::winner_found, this, &MainWindow::show_winner);
@@ -42,6 +44,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
  * Деструктор основного окна.
  */
 MainWindow::~MainWindow() {
+    delete this->game;
+    delete this->field_widget;
     delete ui;
 }
 

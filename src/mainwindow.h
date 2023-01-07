@@ -1,10 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QFont>
-#include <QLabel>
 #include <QMainWindow>
-#include "field.h"
+#include "fieldwidget.h"
 #include "game.h"
 
 QT_BEGIN_NAMESPACE
@@ -33,6 +31,7 @@ public slots:
     void show_winner(Player *winner);
 
 private:
+    FieldWidget *field_widget;
     Game *game;
     Ui::MainWindow *ui;  
 };

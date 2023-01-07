@@ -2,7 +2,6 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QRegExpValidator>
-#include <QVector>
 #include "authorizationdialog.h"
 #include "./ui_authorizationdialog.h"
 
@@ -133,8 +132,7 @@ void AuthorizationDialog::read_database() {
             this->database.append(data);
         };
         database_file.close();
-        qDebug() << "Из файла " << this->DATABASE_NAME << " получено " << this->database.length() <<
-                    " записей";
+        qDebug() << "Из файла " << this->DATABASE_NAME << " получено " << this->database.length() << " записей";
     } else {
         qDebug() << "Не удалось открыть файл " << this->DATABASE_NAME << " с данными авторизации";
         this->database.clear();
